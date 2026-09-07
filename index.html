@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XOR 노노그램</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --paper: #f7f7f7;
+      --paper-light: #ffffff;
+      --ink: #000000;
+      --graphite: #c00000;
+      --line: #000000;
+      --filled-red: #000000;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 38px 12px 64px;
+      color: var(--ink);
+      background-color: var(--paper);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      display: none;
+    }
+
+    body::before {
+      inset: 18px;
+      transform: rotate(-0.35deg);
+    }
+
+    body::after {
+      inset: 26px 12px;
+      transform: rotate(0.25deg);
+    }
+
+    h2 {
+      margin: 0 0 22px;
+      color: var(--ink);
+      font-size: 1.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    h3 {
+      display: inline-block;
+      margin: 28px 0 12px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: normal;
+      letter-spacing: 0.08em;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 19px;
+    }
+
+    button {
+      width: 126px;
+      height: 42px;
+      color: var(--ink);
+      border: 1px solid #000000;
+      border-radius: 0;
+      background-color: var(--paper-light);
+      font: 0.8rem sans-serif;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: color 140ms ease, background-color 140ms ease;
+    }
+
+    button:hover {
+      color: #ffffff;
+      background-color: #000000;
+    }
+
+    button.active {
+      color: #ffffff;
+      background-color: #000000;
+    }
+
+    .grid {
+      --size: min(9.6vw, 37px);
+      display: grid;
+      grid-template-columns: repeat(9, var(--size));
+      grid-template-rows: repeat(9, var(--size));
+      position: relative;
+      border: 3px solid #000000;
+      background: #000000;
+      gap: 1px;
+      width: fit-content;
+      margin: auto;
+      touch-action: none;
+    }
+
+    .cell {
+      width: var(--size);
+      height: var(--size);
+      position: relative;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: background-color 100ms ease, box-shadow 100ms ease;
+    }
+
+    .cell.filled {
+      background-color: var(--filled-red);
+    }
+
+    .cell.x-mark::before,
+    .cell.x-mark::after {
+      content: "";
+      position: absolute;
+      width: 68%;
+      height: 3px;
+      border-radius: 1px;
+      background: var(--graphite);
+      opacity: 1;
+    }
+
+    .cell.x-mark::before {
+      transform: rotate(45deg);
+    }
+
+    .cell.x-mark::after {
+      transform: rotate(-45deg);
+    }
+
+    .result {
+      pointer-events: none;
+      border-color: #000000;
+    }
+
+    hr {
+      width: min(430px, 76vw);
+      margin: 38px auto 0;
+      border: 0 !important;
+      border-top: 1px solid #000000 !important;
+    }
+
+    h5 {
+      color: rgba(0, 0, 0, 0.7);
+      font-weight: normal;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 430px) {
+      body {
+        padding-top: 27px;
+      }
+
+      .grid {
+        border-width: 4px;
+        gap: 1px;
+      }
+
+      button {
+        width: 118px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>노노그램</h2>
+  <h5>노노그램 단서들을 풀고 결과를 작성해서<br>최종 단서를 얻으세요.</h5>
+
+  <div class="controls">
+    <button id="fillBtn" class="active">색칠</button>
+    <button id="xBtn">X 표시</button>
+  </div>
+
+  <h3>단서 1</h3>
+  <div class="grid clue-grid" id="grid1"></div>
+
+  <h3>단서 2</h3>
+  <div class="grid clue-grid" id="grid2"></div>
+
+  <h3>단서 3</h3>
+  <div class="grid clue-grid" id="grid3"></div>
+
+  <br>
+  <br>
+  <hr style="border: 1px solid black;">
+  <h3>XOR 결과</h3>
+  <h5>규칙: 홀수개의 칸은 채우고, 짝수개의 칸은 비운다.</h5>
+  <div class="grid result" id="resultGrid"></div>
+  <br>
+  <h5>용인고등학교</h5>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
