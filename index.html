@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XOR 노노그램</title>
+  <title>노노그램</title>
   <style>
     * {
       box-sizing: border-box;
@@ -27,22 +27,30 @@
       padding: 38px 12px 64px;
       color: var(--ink);
       background-color: var(--paper);
-      overflow-x: hidden;
+      background-image: repeating-linear-gradient(0deg,
+          transparent 0,
+          transparent 31px,
+          rgba(0, 0, 0, 0.045) 32px);
+      position: relative;
     }
 
-    body::before,
-    body::after {
-      display: none;
+    .case-header {
+      width: min(100%, 560px);
+      margin: 8px auto 28px;
+      padding: 18px 14px;
+      border-top: 3px double var(--ink);
+      border-bottom: 3px double var(--ink);
+      box-shadow: 0 1px 0 var(--paper), 0 2px 0 rgba(0, 0, 0, 0.28);
     }
 
-    body::before {
-      inset: 18px;
-      transform: rotate(-0.35deg);
+    .case-kicker {
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
     }
 
-    body::after {
-      inset: 26px 12px;
-      transform: rotate(0.25deg);
+    .case-header h2 {
+      margin-bottom: 0;
     }
 
     h2 {
@@ -50,22 +58,81 @@
       color: var(--ink);
       font-size: 1.5rem;
       letter-spacing: 0.08em;
+      line-height: 1.35;
+    }
+
+    .result-header {
+      margin: 0;
     }
 
     h3 {
       display: inline-block;
-      margin: 28px 0 12px;
+      margin: 0 0 12px;
       color: var(--ink);
       font-size: 0.9rem;
       font-weight: normal;
       letter-spacing: 0.08em;
+      line-height: 1.4;
+    }
+
+    h5 {
+      margin: 0;
+    }
+
+    .intro {
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .clue-switcher {
+      width: min(100%, 430px);
+      margin: 30px auto 38px;
+      padding: 22px 14px 16px;
+      border: 1px solid var(--ink);
+      outline: 1px solid rgba(0, 0, 0, 0.35);
+      outline-offset: 5px;
+      background: linear-gradient(var(--paper-light), var(--paper));
+    }
+
+    .clue-viewport {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .clue-track {
+      display: flex;
+      transition: transform 320ms ease;
+      will-change: transform;
+    }
+
+    .clue {
+      flex: 0 0 100%;
+      min-width: 0;
+    }
+
+    .clue-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(0, 0, 0, 0.35);
+    }
+
+    .clue-button {
+      width: 36px;
+      height: 36px;
+      padding: 0;
     }
 
     .controls {
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 19px;
+      flex-wrap: wrap;
+      margin: 28px auto 19px;
     }
 
     button {
@@ -79,6 +146,7 @@
       letter-spacing: 0.08em;
       cursor: pointer;
       transition: color 140ms ease, background-color 140ms ease;
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.25);
     }
 
     button:hover {
@@ -89,10 +157,11 @@
     button.active {
       color: #ffffff;
       background-color: #000000;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
     }
 
     .grid {
-      --size: min(9.6vw, 37px);
+      --size: clamp(18px, calc((100vw - 50px) / 9), 37px);
       display: grid;
       grid-template-columns: repeat(9, var(--size));
       grid-template-rows: repeat(9, var(--size));
@@ -103,6 +172,10 @@
       width: fit-content;
       margin: auto;
       touch-action: none;
+    }
+
+    .clue-grid {
+      pointer-events: none;
     }
 
     .cell {
@@ -140,22 +213,42 @@
       transform: rotate(-45deg);
     }
 
-    .result {
-      pointer-events: none;
-      border-color: #000000;
-    }
-
     hr {
       width: min(430px, 76vw);
-      margin: 38px auto 0;
+      margin: 38px auto 28px;
       border: 0 !important;
-      border-top: 1px solid #000000 !important;
+      border-top: 3px double #000000 !important;
     }
 
-    h5 {
+    .result-section {
+      width: min(100%, 430px);
+      margin: 0 auto;
+      padding: 18px 12px 20px;
+      border: 1px solid var(--ink);
+      outline: 1px solid rgba(0, 0, 0, 0.35);
+      outline-offset: 5px;
+      background-color: var(--paper-light);
+    }
+
+    .result-section h2 {
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .result-section h5 {
       color: rgba(0, 0, 0, 0.7);
       font-weight: normal;
       letter-spacing: 0.04em;
+      line-height: 1.7;
+    }
+
+    .result-section h5+h5 {
+      margin-top: 12px;
+    }
+
+    .footer-note {
+      margin-top: 42px;
       line-height: 1.7;
     }
 
@@ -169,6 +262,10 @@
         gap: 1px;
       }
 
+      .clue-grid {
+        --size: clamp(16px, calc((100vw - 86px) / 9), 37px);
+      }
+
       button {
         width: 118px;
       }
@@ -177,31 +274,49 @@
 </head>
 
 <body>
-  <h2>노노그램</h2>
-  <h5>노노그램 단서들을 풀고 결과를 작성해서<br>최종 단서를 얻으세요.</h5>
+  <header class="case-header">
+    <div class="case-kicker">LAST CASE FILE</div>
+    <h2>노노그램</h2>
+  </header>
+  <h3 class="intro">단서들을 확인하고 계산하여<br>최종 결과를 얻으세요.</h3>
 
+  <div class="clue-switcher" aria-label="고정 단서 전환">
+    <div class="clue-viewport">
+      <div class="clue-track" id="clueTrack">
+        <section class="clue">
+          <h3>단서 1 - 집</h3>
+          <div class="grid clue-grid" id="grid1"></div>
+        </section>
+        <section class="clue">
+          <h3>단서 2 - 나무</h3>
+          <div class="grid clue-grid" id="grid2"></div>
+        </section>
+        <section class="clue">
+          <h3>단서 3 - 표정</h3>
+          <div class="grid clue-grid" id="grid3"></div>
+        </section>
+      </div>
+    </div>
+    <div class="clue-buttons" role="group" aria-label="볼 단서 선택">
+      <button class="clue-button active" type="button" data-clue="0" aria-label="단서 1 보기"
+        aria-selected="true">1</button>
+      <button class="clue-button" type="button" data-clue="1" aria-label="단서 2 보기" aria-selected="false">2</button>
+      <button class="clue-button" type="button" data-clue="2" aria-label="단서 3 보기" aria-selected="false">3</button>
+    </div>
+  </div>
+
+  <hr>
+  <div class="result-section">
+    <h2>최종 결과</h2>
+    <h5>XOR 계산을 통해 최종 결과를 얻으세요.</h5>
+    <h5>- XOR 계산 방법 -<br>위 단서들에서 홀수개만큼 칠해진 칸은 칠하고,<br>짝수개만큼 칠해진 칸은 비우세요.</h5>
+  </div>
   <div class="controls">
     <button id="fillBtn" class="active">색칠</button>
     <button id="xBtn">X 표시</button>
   </div>
-
-  <h3>단서 1</h3>
-  <div class="grid clue-grid" id="grid1"></div>
-
-  <h3>단서 2</h3>
-  <div class="grid clue-grid" id="grid2"></div>
-
-  <h3>단서 3</h3>
-  <div class="grid clue-grid" id="grid3"></div>
-
-  <br>
-  <br>
-  <hr style="border: 1px solid black;">
-  <h3>XOR 결과</h3>
-  <h5>규칙: 홀수개의 칸은 채우고, 짝수개의 칸은 비운다.</h5>
-  <div class="grid result" id="resultGrid"></div>
-  <br>
-  <h4>용인고등학교</h4>
+  <div class="grid" id="interactiveGrid"></div>
+  <h5 class="footer-note">용인고등학교</h5>
 
   <script src="script.js"></script>
 
